@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
-import { getSubredditPosts, getPostComments } from '../api/reddit';
+import { getSubredditPosts, getPostComments, searchPosts } from '../api/reddit';
 
 const initialState = {
     allPosts: [],
@@ -22,6 +22,14 @@ export const startGetPostComments = createAsyncThunk(
     async ({ index, permalink }, thunkAPI) => {
         const comments = await getPostComments(permalink);
         return { comments, index };
+    }
+);
+
+export const startSearchPosts = createAsyncThunk(
+    'reddit/startSearchPosts',
+    async (searchTerm, thunkAPI) => {
+        const response = await searchPosts(searchTerm);
+        return response;
     }
 );
 
@@ -76,6 +84,19 @@ export const redditSlice = createSlice({
                 const { index } = action.meta.arg;
                 state.allPosts[index].isLoadingComment = false;
                 state.allPosts[index].hasErrorComment = true;
+            })
+            .addCase(startSearchPosts.pending, (state) => {
+                state.isLoading = true;
+                state.hasError = false;
+            })
+            .addCase(startSearchPosts.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.hasError = false;
+                state.allPosts = action.payload;
+            })
+            .addCase(startSearchPosts.rejected, (state) => {
+                state.isLoading = false;
+                state.hasError = true;
             });
     }
 });
