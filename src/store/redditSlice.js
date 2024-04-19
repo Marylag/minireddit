@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
-import { getSubredditPosts, getPostComments, searchPosts } from '../api/reddit';
+import { getSubredditPosts, getPostComments} from '../api/reddit';
 
 const initialState = {
     allPosts: [],
@@ -26,10 +26,17 @@ export const startGetPostComments = createAsyncThunk(
 );
 
 export const startSearchPosts = createAsyncThunk(
-    'reddit/startSearchPosts',
-    async (searchTerm, thunkAPI) => {
-        const response = await searchPosts(searchTerm);
-        return response;
+    "reddit/startSearchPosts",
+    async (_, { getState }) =>
+    {
+        const { selectedSubreddit, searchTerm } = getState().reddit;
+        const response = await fetch(
+            selectedSubreddit
+                ? `https://www.reddit.com${selectedSubreddit}search.json?q=${searchTerm}`
+                : `https://www.reddit.com/search.json?q=${searchTerm}`
+        );
+        const json = await response.json();
+        return json.data.children.map((item) => item.data);
     }
 );
 
