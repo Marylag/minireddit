@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSubtopics } from "../../store/subredditSlice";
-import { changeSubreddit } from "../../store/redditSlice";
+import { changeSubreddit, changeSearchTerm } from "../../store/redditSlice";
 import { FaReddit } from "react-icons/fa";
 import "./Subreddits.css";
 
@@ -19,12 +19,20 @@ export const Subreddits = () => {
         dispatch(changeSubreddit(url));
     }
 
-    const displaySubreddit = () => {
-        if (isLoading) {
+    const handleSearchTermChange = (event) => {
+        dispatch(changeSearchTerm(event.target.value));
+    };
+
+    const displaySubreddit = () =>
+    {
+        if (isLoading)
+        {
             return <p>Loading...</p>
-        } else if (hasError) {
+        } else if (hasError)
+        {
             return <p>Error</p>
-        } else if (subtopics.length > 0) {
+        } else if (subtopics.length > 0)
+        {
             return (
                 <div className="subtopics">
                     <h2>Subreddits</h2>
@@ -49,7 +57,8 @@ export const Subreddits = () => {
 
     return (
         <div className="subreddits">
+            <input type="text" onChange={handleSearchTermChange} />
             {displaySubreddit()}
         </div>
-    )
+    );
 };
